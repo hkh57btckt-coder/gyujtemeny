@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Logikai lapok – Mire gondoltam?</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff6e0;--card:#ffffff;--ink:#2b2750;--mut:#6d6a8c;--line:#e9dfc2;--acc:#7c5cff;--yes:#2fb45a;--no:#f0485a;--tile:#fffdf6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1b3a;--card:#2a2750;--ink:#fff4dc;--mut:#b4b0d8;--line:#403c70;--acc:#a38dff;--tile:#332f5e}}
+:root[data-theme="dark"]{--bg:#1d1b3a;--card:#2a2750;--ink:#fff4dc;--mut:#b4b0d8;--line:#403c70;--acc:#a38dff;--tile:#332f5e}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Baloo 2","Trebuchet MS",system-ui,sans-serif;font-weight:500;line-height:1.3}
+main{max-width:860px;margin:0 auto;padding:14px 14px 40px}
+h1{margin:6px 0 2px;font-size:clamp(28px,6vw,42px);font-weight:800;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+h1 svg{width:44px;height:44px}
+.sub{color:var(--mut);margin:0 0 12px}
+.tabs{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.card{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0}
+.sg{width:84px;height:84px;display:grid;place-items:center;background:var(--bg);border-radius:18px;border:3px solid var(--line);color:var(--ink)}
+.sg svg{width:66px;height:66px}.sg .em{font-size:48px;line-height:1}
+.chip .em{font-size:32px;line-height:42px}
+.btn:disabled{opacity:.45;cursor:default}
+.tab{flex:1 1 180px;border:3px solid var(--line);background:var(--card);color:var(--ink);border-radius:18px;padding:8px 10px;font:inherit;font-weight:700;cursor:pointer}
+.tab[aria-selected=true]{border-color:var(--acc);background:var(--acc);color:#fff}
+.panel{background:var(--card);border:3px solid var(--line);border-radius:22px;padding:14px;margin-bottom:14px}
+.timer{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.timer input{flex:1;min-width:120px;accent-color:var(--acc)}
+.clock{font-weight:800;font-size:22px;min-width:76px;text-align:right}
+.bar{height:12px;border-radius:8px;background:var(--line);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#3cc36a,#ffcf2b,#f0485a);background-size:300% 100%;transition:width 1s linear}
+.btn{border:0;border-radius:16px;padding:10px 20px;font:inherit;font-weight:800;font-size:18px;color:#fff;background:var(--acc);cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.btn.y{background:var(--yes)}.btn.n{background:var(--no)}.btn.g{background:var(--mut)}
+.btn:focus-visible,.tab:focus-visible,.chip:focus-visible,.tile:focus-visible{outline:4px solid var(--acc);outline-offset:2px}
+.q{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.q svg{width:84px;height:84px;flex:none}
+.q .t{flex:1;min-width:180px;font-size:clamp(20px,4vw,26px);font-weight:700}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.pal{display:flex;flex-wrap:wrap;gap:8px}
+.grp{display:flex;flex-wrap:wrap;gap:6px;padding:6px;border-radius:16px;background:var(--bg)}
+.chip{display:flex;flex-direction:column;align-items:center;width:78px;border:3px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:4px 2px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.chip svg{width:42px;height:42px}
+.chip.yes{border-color:var(--yes);background:color-mix(in srgb,var(--yes) 20%,var(--card))}
+.chip.no{border-color:var(--no);background:color-mix(in srgb,var(--no) 18%,var(--card))}
+.chip:disabled{cursor:default;opacity:.55}
+.msg{min-height:30px;font-weight:700;margin:8px 2px 0}
+.stat{color:var(--mut);font-size:15px;margin-top:4px}
+.grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+@media (max-width:620px){.grid{grid-template-columns:repeat(6,1fr)}.chip{width:70px}}
+.tile{aspect-ratio:1;border:2px solid var(--line);background:var(--tile);border-radius:14px;padding:2px;transition:opacity .25s,transform .2s;cursor:default;position:relative}
+.tile svg{width:100%;height:100%;display:block;filter:drop-shadow(0 2px 0 rgba(0,0,0,.15))}
+.tile.dim{opacity:.13;transform:scale(.88)}
+.tile.x::after{content:"✕";position:absolute;inset:0;display:grid;place-items:center;font-size:30px;font-weight:800;color:var(--no)}
+.guessing .tile:not(.dim):not(.x){cursor:pointer}
+.guessing .tile:not(.dim):not(.x):hover{transform:scale(1.08);border-color:var(--acc)}
+.shake{animation:sh .4s}
+@keyframes sh{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.ov{position:fixed;inset:0;background:rgba(20,15,50,.65);display:grid;place-items:center;padding:16px;z-index:20}
+.dlg{background:var(--card);border-radius:28px;padding:22px;max-width:380px;width:100%;text-align:center;border:4px solid var(--acc)}
+.dlg h2{margin:0 0 4px;font-size:30px;font-weight:800}
+.dlg svg.big{width:200px;height:200px;filter:drop-shadow(0 4px 0 rgba(0,0,0,.2));animation:pop .6s}
+@keyframes pop{0%{transform:scale(.2) rotate(-40deg)}70%{transform:scale(1.15) rotate(6deg)}100%{transform:scale(1)}}
+.tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:6px 0 12px}
+.tags span{background:var(--bg);border-radius:12px;padding:2px 10px;font-weight:700}
+.cf{position:fixed;top:-20px;width:10px;height:14px;z-index:30;animation:fall 2.6s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<h1><svg viewBox="0 0 100 100" id="logo"></svg>Mire gondoltam?</h1>
+<p class="sub">48 logikai lap: 3 forma, 2 méret, 4 szín, 2 felület.</p>
+<div class="tabs" role="tablist">
+<button class="tab" role="tab" id="t0" onclick="setMode('think')">🧠 Én gondolok, te találd ki</button>
+<button class="tab" role="tab" id="t1" onclick="setMode('guess')">🔍 Te gondolsz, én keresek</button>
+<button class="tab" role="tab" id="t2" onclick="setMode('signs')">🤟 Jelekkel mondom meg</button>
+</div>
+<div class="panel timer">
+<label for="tm" style="font-weight:700">⏱ Időzítő</label>
+<input type="range" id="tm" min="0" max="300" step="15" value="120">
+<span class="clock" id="clk"></span>
+<div class="bar" style="flex-basis:100%" id="barw"><i id="bar"></i></div>
+</div>
+<div class="panel" id="ctl"></div>
+<div class="grid" id="grid"></div>
+</main>
+<div id="ovl"></div>
+<script>
+var COL=['#3cc36a','#ffcf2b','#f0485a','#3a86ff'],NEU='#8c93b0';
+var L={sh:['kör','négyzet','háromszög'],sz:['nagy','kicsi'],co:['zöld','sárga','piros','kék'],ho:['nem lyukas','lyukas']};
+var ADJ={sh:['kör alakú','négyzet alakú','háromszög alakú'],sz:['nagy','kicsi'],co:['zöld','sárga','piros','kék'],ho:['tömör (lyuk nélküli)','lyukas']};
+var KEYS=['sh','sz','co','ho'],CNT={sh:3,sz:2,co:4,ho:2};
+var P=[];for(var a=0;a<3;a++)for(var b=0;b<2;b++)for(var c=0;c<4;c++)for(var d=0;d<2;d++)P.push({sh:a,sz:b,co:c,ho:d});
+function pth(sh,s,ho){var d,hy=50,hr;
+ if(sh==0){var r=44*s;d='M'+(50-r)+' 50a'+r+' '+r+' 0 1 0 '+2*r+' 0a'+r+' '+r+' 0 1 0 '+(-2*r)+' 0z';hr=16*s}
+ else if(sh==1){var h=40*s;d='M'+(50-h)+' '+(50-h)+'h'+2*h+'v'+2*h+'h'+(-2*h)+'z';hr=16*s}
+ else{d='M50 '+(50-42*s)+'L'+(50+46*s)+' '+(50+38*s)+'L'+(50-46*s)+' '+(50+38*s)+'z';hy=50+11*s;hr=14*s}
+ if(ho)d+='M'+(50-hr)+' '+hy+'a'+hr+' '+hr+' 0 1 0 '+2*hr+' 0a'+hr+' '+hr+' 0 1 0 '+(-2*hr)+' 0z';return d}
+function pc(p,cls){var s=p.sz?0.58:1,f=COL[p.co];
+ return '<svg viewBox="0 0 100 100" class="'+(cls||'')+'" aria-label="'+nm(p)+'"><path d="'+pth(p.sh,s,p.ho)+'" fill="'+f+'" stroke="'+f+'" stroke-width="6" stroke-linejoin="round" fill-rule="evenodd"/></svg>'}
+function ic(k,v){var body;
+ if(k=='sh')body='<path d="'+pth(v,1,0)+'" fill="'+NEU+'" stroke="'+NEU+'" stroke-width="6" stroke-linejoin="round"/>';
+ else if(k=='sz')body='<circle cx="50" cy="50" r="46" fill="none" stroke="'+NEU+'" stroke-width="3" stroke-dasharray="6 6"/><path d="'+pth(0,v?0.5:0.95,0)+'" fill="'+NEU+'"/>';
+ else if(k=='co')body='<path d="'+pth(0,1,0)+'" fill="'+COL[v]+'"/>';
+ else body='<path d="'+pth(0,1,v)+'" fill="#8d6bff" fill-rule="evenodd"/>';
+ return '<svg viewBox="0 0 100 100" aria-hidden="true">'+body+'</svg>'}
+function nm(p){return L.sz[p.sz]+' '+L.co[p.co]+' '+L.sh[p.sh]+', '+L.ho[p.ho]}
+document.getElementById('logo').innerHTML=[{sh:0,sz:0,co:2,ho:0},{sh:1,sz:1,co:3,ho:1},{sh:2,sz:0,co:1,ho:0}].map(function(p,i){return '<g transform="translate('+(i==1?0:0)+' 0)"></g>'}).join('')+
+ '<path d="'+pth(0,.5,0)+'" transform="translate(-20 -18)" fill="'+COL[2]+'"/><path d="'+pth(1,.5,1)+'" transform="translate(22 -14)" fill="'+COL[3]+'" fill-rule="evenodd"/><path d="'+pth(2,.55,0)+'" transform="translate(0 24)" fill="'+COL[1]+'"/>';
+
+var mode='think',run=false,secret=null,cons=[],wrong=[],qn=0,gn=0,left=0,tid=null,total=120,msg='';
+var $=function(i){return document.getElementById(i)};
+function fits(p,c){return (p[c.k]===c.v)===c.a}
+function cands(){return P.filter(function(p){return cons.every(function(c){return fits(p,c)})})}
+function fmt(s){return Math.floor(s/60)+':'+('0'+s%60).slice(-2)}
+function setMode(m){mode=m;stop();run=false;cons=[];wrong=[];qn=gn=0;msg='';secret=null;sel={};render()}
+function stop(){clearInterval(tid);tid=null}
+function start(){run=true;cons=[];wrong=[];qn=gn=0;msg='';
+ secret=pickSecret();
+ total=+$('tm').value;left=total;stop();
+ if(total>0)tid=setInterval(function(){left--;if(left<=0){left=0;tick();stop();timeUp();return}tick()},1000);
+ render()}
+function tick(){$('clk').textContent=total?fmt(left):'nincs';$('bar').style.width=total?(left/total*100)+'%':'100%'}
+function timeUp(){if(!run)return;run=false;var cs=cands();
+ if(mode!='think')reveal(secret,'Lejárt az idő! ⏰','Erre gondoltam:',false);
+ else reveal(cs[0]||P[0],'Lejárt az idő! ⏰',cs.length>1?'Még '+cs.length+' lap maradt. Talán ez az egyik?':'Erre gondoltál?',false);
+ render()}
+$('tm').oninput=function(){total=+this.value;if(!run){left=total}tick()};
+function ask(k,v){if(!run||mode!='guess')return;var a=secret[k]===v;cons.push({k:k,v:v,a:a});qn++;
+ msg=(a?'Igen! ':'Nem. ')+(a?'A lap ':'A lap nem ')+ADJ[k][v]+'.';render()}
+function guess(i){if(!run||mode=='think')return;var p=P[i];if(!cands().includes(p)||wrong.includes(i))return;
+ if(p===secret){run=false;stop();reveal(secret,'Eltaláltad! 🎉',(mode=='signs'?'Erre gondoltam. A(z) '+(gn+1)+'. tippre eltaláltad!':'Erre gondoltam. '+qn+' kérdés, '+gn+' téves tipp.'),true)}
+ else{gn++;wrong.push(i);msg='Nem ez az, próbáld újra!';if(mode=='signs'){msg='Nem ez az! Még '+(3-gn)+' tipped van.';if(gn>=3){run=false;stop();render();reveal(secret,'Elfogytak a tippek 😮','Erre gondoltam:',false);return}}var t=document.querySelectorAll('.tile')[i];render();var n=document.querySelectorAll('.tile')[i];n.classList.add('shake')}
+ if(!run)render()}
+function pickQ(){var cs=cands(),n=cs.length,best=null,bd=1e9;
+ KEYS.forEach(function(k){for(var v=0;v<CNT[k];v++){if(cons.some(function(c){return c.k==k&&c.v==v}))continue;
+  var m=cs.filter(function(p){return p[k]===v}).length;if(m==0||m==n)continue;var d=Math.abs(m-n/2);if(d<bd){bd=d;best={k:k,v:v}}}});return best}
+function answer(a){var q=pickQ();cons.push({k:q.k,v:q.v,a:a});qn++;render();
+ var cs=cands();if(cs.length==1){run=false;stop();reveal(cs[0],'Megvan! 🎉','Erre gondoltál. '+qn+' kérdésből kitaláltam.',true);render()}}
+function undo(){cons.pop();qn=Math.max(0,qn-1);render()}
+function reveal(p,h,t,win){var o=$('ovl');
+ o.innerHTML='<div class="ov"><div class="dlg" role="dialog" aria-modal="true"><h2>'+h+'</h2><p style="margin:0 0 4px">'+t+'</p>'+pc(p,'big')+
+ '<div class="tags"><span>'+L.sh[p.sh]+'</span><span>'+L.sz[p.sz]+'</span><span>'+L.co[p.co]+'</span><span>'+L.ho[p.ho]+'</span></div><button class="btn" onclick="closeO();again()">Új játék</button> <button class="btn g" onclick="closeO()">Bezár</button></div></div>';
+ if(win)confetti()}
+function closeO(){$('ovl').innerHTML=''}
+function confetti(){for(var i=0;i<46;i++){var s=document.createElement('span');s.className='cf';s.style.left=Math.random()*100+'vw';s.style.background=COL[i%4];s.style.animationDelay=Math.random()*.8+'s';document.body.appendChild(s);setTimeout(function(e){e.remove()},3600,s)}}
+function render(){
+ $('t0').setAttribute('aria-selected',mode=='think');$('t1').setAttribute('aria-selected',mode=='guess');$('t2').setAttribute('aria-selected',mode=='signs');
+ tick();var h='',cs=cands();
+ if(mode=='signs'){h=signsUI()}
+ else if(!run){
+  h=mode=='think'?'<p style="margin:0 0 8px;font-size:19px"><b>Gondolj egy lapra</b> a 48 közül, és ne áruld el! Kérdezgetek a tulajdonságairól, te pedig csak annyit felelsz: igen vagy nem. A végén megmutatom, mire gondoltál.</p>'
+  :'<p style="margin:0 0 8px;font-size:19px"><b>Én gondolok egy lapra.</b> Kérdezz a formájáról, méretéről, színéről és felületéről, a halványuló lapok segítenek kizárni. Ha tudod, koppints a lapra! A végén megmutatom, mire gondoltam.</p>';
+  h+='<button class="btn" onclick="start()">'+(mode=='think'?'Gondoltam egy lapra!':'Kezdjük!')+'</button>'}
+ else if(mode=='think'){var q=pickQ();
+  if(!q)h='<p class="t">Hoppá, ellentmondás lett. Vonj vissza egy választ!</p><button class="btn g" onclick="undo()">↩ Visszavonás</button>';
+  else h='<div class="q">'+ic(q.k,q.v)+'<div class="t">A lapod <b>'+ADJ[q.k][q.v]+'</b>?</div></div><div class="row"><button class="btn y" onclick="answer(true)">Igen</button><button class="btn n" onclick="answer(false)">Nem</button>'+(cons.length?'<button class="btn g" onclick="undo()">↩ Vissza</button>':'')+'</div><div class="stat">'+qn+'. kérdés kész · még '+cs.length+' lap jöhet szóba</div>'}
+ else{h='<div class="pal">';
+  KEYS.forEach(function(k){h+='<div class="grp">';for(var v=0;v<CNT[k];v++){
+   var c=cons.filter(function(x){return x.k==k&&x.v==v})[0],m=cs.filter(function(p){return p[k]===v}).length,known=c||m==0||m==cs.length;
+   var cl=c?(c.a?'yes':'no'):'';if(!c&&known)cl=m?'yes':'no';
+   h+='<button class="chip '+cl+'" '+(known?'disabled':'')+' onclick="ask(\''+k+'\','+v+')">'+ic(k,v)+L[k][v]+'</button>'}h+='</div>'});
+  h+='</div><div class="msg" aria-live="polite">'+(msg||'Kérdezz valamit, vagy tippelj a lapra koppintva!')+'</div><div class="stat">'+qn+' kérdés · '+gn+' téves tipp · még '+cs.length+' lap jöhet szóba</div>'}
+ $('ctl').innerHTML=h;
+ var g='';P.forEach(function(p,i){var dim=!cs.includes(p)&&(run||cons.length);g+='<button class="tile'+(dim?' dim':'')+(wrong.includes(i)?' x':'')+'" '+(run&&mode!='think'&&!dim?'onclick="guess('+i+')"':'tabindex="-1"')+' aria-label="'+nm(p)+'">'+pc(p)+'</button>'});
+ $('grid').innerHTML=g;$('grid').className='grid'+(run&&mode!='think'?' guessing':'')}
+var sel={};
+var SL={sh:L.sh,sz:L.sz,co:L.co,ho:['sima','lyukas']},EM=['🟢','🟡','🔴','🔵'];
+function rnd(){return P[Math.floor(Math.random()*P.length)]}
+function full(){return KEYS.every(function(k){return sel[k]!==undefined})}
+function pickSecret(){if(mode=='guess')return rnd();if(mode!='signs')return null;
+ var s=full()?P.filter(function(p){return KEYS.every(function(k){return p[k]===sel[k]})})[0]:rnd();
+ KEYS.forEach(function(k){sel[k]=s[k]});return s}
+function pick(k,v){sel[k]=v;render()}
+function again(){if(mode=='signs'){run=false;sel={};stop();wrong=[];gn=0;left=total;render()}else start()}
+function sic(k,v){
+ if(k=='co')return '<span class="em">'+EM[v]+'</span>';
+ var st='viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+ if(k=='sh')return '<svg viewBox="0 0 100 100" aria-hidden="true"><path d="'+pth(v,1,0)+'" fill="#dfe2ee" stroke="'+NEU+'" stroke-width="4" stroke-linejoin="round"/></svg>';
+ if(k=='sz')return '<svg '+st+'><circle cx="50" cy="20" r="10"/><path d="M50 32V64M50 64L38 90M50 64L62 90'+(v?'M50 42L30 66M50 42L70 66':'M50 42L28 16M50 42L72 16')+'"/></svg>';
+ return '<svg '+st+' stroke-width="9"><circle cx="50" cy="50" r="22"/>'+(v?'':'<path d="M20 20L80 80" stroke="#f0485a"/>')+'</svg>'}
+function card(){return '<div class="card">'+KEYS.map(function(k){return '<div class="sg">'+(sel[k]===undefined?'<span class="em">❔</span>':sic(k,sel[k]))+'</div>'}).join('')+'</div>'}
+function signsUI(){var h;
+ if(run){var hh='';for(var i=0;i<3;i++)hh+=i<gn?'🤍':'❤️';
+  return '<div style="font-weight:700;font-size:19px">Fejtsd meg a jeleket! Melyik lapra gondoltam? Három tipped van.</div>'+card()+'<div class="msg" aria-live="polite">'+(msg||'Koppints arra a lapra, amelyikre a jelek utalnak!')+'</div><div class="stat">'+hh+' hátralévő tipp</div>'}
+ h='<p style="margin:0 0 6px;font-size:19px"><b>Gondolj egy lapra, és mondd el jelekkel!</b> 🎨 Állítsd össze a jelkártyát, a többiek pedig három tippből találják ki a lapot.</p><div class="pal">';
+ KEYS.forEach(function(k){h+='<div class="grp">';for(var v=0;v<CNT[k];v++)h+='<button class="chip'+(sel[k]===v?' yes':'')+'" onclick="pick(\''+k+'\','+v+')">'+sic(k,v)+SL[k][v]+'</button>';h+='</div>'});
+ h+='</div><div class="row" style="justify-content:center"><button class="btn y" '+(full()?'':'disabled')+' onclick="start()">Kész a jelkártya, találgassatok!</button><button class="btn" onclick="sel={};start()">🎲 Véletlen lap</button></div>';
+ return h}
+left=total;render();
+</script>
+</body>
+</html>
